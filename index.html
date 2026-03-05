@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#f7f4ee">
+<meta name="mobile-web-app-capable" content="yes">
+<title>PDDAI</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f4ee;--bg2:#eee9df;--bg3:#e5dfd3;
+  --card:#fffdf8;--card2:#f2ede3;
+  --border:#d8d0c0;--border2:#c8bfac;
+  --accent:#2d6a4f;--accent2:#1b4332;
+  --amber:#b5610a;--amber-light:#fff3e0;
+  --blue:#1a5276;--blue-light:#d6eaf8;
+  --red:#c0392b;--red-light:#fde8e6;
+  --text:#1a1612;--text2:#4a4035;--text3:#8a7e6e;
+  --mono:'DM Sans',sans-serif;--display:'Playfair Display',serif;
+  --radius:14px;--shadow:0 2px 12px rgba(0,0,0,0.08);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overscroll-behavior:none}
+body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh;display:flex;flex-direction:column}
+.screen{display:none;flex-direction:column;min-height:100vh;min-height:100dvh;padding:0 16px 32px;max-width:540px;margin:0 auto;width:100%}
+.screen.active{display:flex}
+
+/* HOME */
+#home{padding-top:0}
+.home-header{text-align:center;padding:32px 0 22px;border-bottom:2px solid var(--border);margin-bottom:18px}
+.home-title{font-family:var(--display);font-size:2.6rem;font-weight:800;color:var(--accent2);line-height:1}
+.home-subtitle{font-size:0.66rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--text3);margin-top:6px}
+.ia-status-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px}
+.ia-dot{width:9px;height:9px;border-radius:50%;background:var(--border2);transition:background 0.3s;flex-shrink:0}
+.ia-dot.on{background:var(--accent);animation:breathe 2s infinite}
+@keyframes breathe{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.65)}}
+.ia-status-txt{font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3)}
+
+.btn-ia{width:100%;font-family:var(--display);font-size:1.2rem;font-weight:700;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);padding:19px;cursor:pointer;margin-bottom:14px;box-shadow:0 4px 20px rgba(45,106,79,0.28);transition:all 0.2s}
+.btn-ia:active{transform:scale(0.98)}
+.btn-ia.on{background:var(--red);box-shadow:0 4px 20px rgba(192,57,43,0.28)}
+
+.live-box{background:var(--card);border:1.5px solid var(--border);border-left:4px solid var(--accent);border-radius:var(--radius);padding:10px 14px;margin-bottom:10px;display:none}
+.live-box.show{display:block}
+.live-label{font-size:0.55rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);margin-bottom:3px}
+.live-text{font-size:0.82rem;color:var(--text2);line-height:1.5}
+
+.acc-box{background:var(--amber-light);border:1.5px solid rgba(181,97,10,0.3);border-left:4px solid var(--amber);border-radius:var(--radius);padding:10px 14px;margin-bottom:10px;display:none}
+.acc-box.show{display:block}
+.acc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px}
+.acc-label{font-size:0.55rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--amber)}
+.acc-timer{font-size:0.6rem;color:var(--amber);font-weight:600}
+.acc-text{font-size:0.8rem;color:var(--text2);line-height:1.5}
+.acc-progress{height:3px;background:rgba(181,97,10,0.15);border-radius:2px;margin-top:8px;overflow:hidden}
+.acc-fill{height:100%;background:var(--amber);border-radius:2px;transition:width 1s linear}
+
+.proc-bar{background:var(--blue-light);border:1px solid rgba(26,82,118,0.2);border-radius:10px;padding:8px 14px;font-size:0.72rem;color:var(--blue);display:none;align-items:center;gap:8px;margin-bottom:10px;flex-shrink:0}
+.proc-bar.show{display:flex}
+.spin{width:12px;height:12px;border:2px solid rgba(26,82,118,0.2);border-top-color:var(--blue);border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.nav-cards{display:flex;flex-direction:column;gap:10px}
+.nav-card{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:15px 18px;cursor:pointer;transition:all 0.15s;box-shadow:var(--shadow)}
+.nav-card:active{transform:scale(0.99);background:var(--card2)}
+.nav-card-left{display:flex;align-items:center;gap:12px}
+.nav-card-icon{font-size:1.35rem;width:36px;text-align:center}
+.nav-card-label{font-size:0.88rem;font-weight:600;color:var(--text)}
+.nav-card-sub{font-size:0.68rem;color:var(--text3);margin-top:2px}
+.nav-badge{font-size:0.72rem;font-weight:700;border-radius:100px;padding:4px 12px;min-width:30px;text-align:center}
+.nav-badge.amber{background:var(--amber-light);color:var(--amber);border:1px solid rgba(181,97,10,0.22)}
+.nav-badge.blue{background:var(--blue-light);color:var(--blue);border:1px solid rgba(26,82,118,0.22)}
+.nav-badge.gray{background:var(--bg2);color:var(--text3);border:1px solid var(--border)}
+
+/* INNER */
+.inner-header{display:flex;align-items:center;gap:10px;padding:18px 0 13px;border-bottom:1.5px solid var(--border);margin-bottom:14px;flex-shrink:0}
+.btn-back{font-size:1.3rem;cursor:pointer;padding:4px 8px;border-radius:8px}
+.btn-back:active{background:var(--bg2)}
+.inner-title{font-family:var(--display);font-size:1.12rem;font-weight:700;color:var(--text);flex:1}
+.btn-clear-all{font-size:0.6rem;font-weight:600;color:var(--red);background:var(--red-light);border:1px solid rgba(192,57,43,0.2);border-radius:8px;padding:6px 12px;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.btn-clear-all:active{opacity:0.7}
+
+/* MESA CARDS */
+.mesa-list{display:flex;flex-direction:column;gap:12px;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:20px}
+.mesa-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);animation:fadeUp 0.22s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.mesa-card-hd{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--card2);border-bottom:1px solid var(--border)}
+.mesa-card-title{font-weight:700;font-size:0.9rem;color:var(--text)}
+.mesa-card-actions{display:flex;align-items:center;gap:8px}
+.mesa-card-meta{font-size:0.6rem;color:var(--text3)}
+.btn-del{font-size:0.68rem;color:var(--red);background:var(--red-light);border:1px solid rgba(192,57,43,0.2);border-radius:6px;padding:4px 10px;cursor:pointer}
+.btn-del:active{opacity:0.7}
+.btn-ok{font-size:1.25rem;cursor:pointer;padding:2px 4px;border-radius:6px;transition:transform 0.15s}
+.btn-ok:active{transform:scale(0.8)}
+.mesa-card-body{padding:12px 14px}
+.m-item{display:flex;align-items:baseline;gap:6px;padding:3px 0;font-size:0.85rem}
+.m-qty{font-weight:700;color:var(--accent2);min-width:22px;flex-shrink:0}
+.m-name{flex:1;color:var(--text)}
+.m-sub{padding:2px 0 3px 28px;font-size:0.77rem;color:var(--text3);font-style:italic}
+.m-special{padding:4px 0;font-size:0.83rem;color:var(--amber);font-weight:600}
+
+.empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--text3);padding:40px 20px}
+.empty-icon{font-size:2.4rem;opacity:0.22}
+.empty-msg{font-size:0.75rem;text-align:center;line-height:1.7}
+
+/* COMANDOS */
+.cmd-scroll{overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch;padding-bottom:20px}
+.cmd-sec-title{font-size:0.6rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--text3);margin:16px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--border)}
+.cmd-item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 14px;margin-bottom:8px}
+.cmd-voice{font-size:0.8rem;font-weight:600;color:var(--accent2);margin-bottom:4px}
+.cmd-voice::before{content:'🎙 '}
+.cmd-desc{font-size:0.73rem;color:var(--text3);line-height:1.55}
+
+/* TREINO DE VOZ */
+.treino-scroll{overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch;padding-bottom:20px}
+.treino-status-bar{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.treino-status-icon{font-size:1.4rem;flex-shrink:0}
+.treino-status-info{flex:1}
+.treino-status-title{font-size:0.82rem;font-weight:600;color:var(--text)}
+.treino-status-sub{font-size:0.68rem;color:var(--text3);margin-top:2px}
+.treino-progress-row{display:flex;align-items:center;gap:8px;margin-top:6px}
+.treino-progress-bar{flex:1;height:5px;background:var(--bg2);border-radius:3px;overflow:hidden}
+.treino-progress-fill{height:100%;background:var(--accent);border-radius:3px;transition:width 0.4s ease}
+.treino-progress-txt{font-size:0.65rem;color:var(--text3);white-space:nowrap}
+
+.treino-cmd-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);margin-bottom:10px;overflow:hidden;transition:border-color 0.2s}
+.treino-cmd-card.gravado{border-color:var(--accent)}
+.treino-cmd-card.gravando{border-color:var(--red);box-shadow:0 0 0 3px rgba(192,57,43,0.12)}
+.treino-cmd-hd{display:flex;align-items:center;padding:12px 14px;gap:10px}
+.treino-cmd-icon{font-size:1.1rem;flex-shrink:0;width:28px;text-align:center}
+.treino-cmd-info{flex:1}
+.treino-cmd-frase{font-size:0.85rem;font-weight:600;color:var(--text)}
+.treino-cmd-dica{font-size:0.68rem;color:var(--text3);margin-top:2px;font-style:italic}
+.treino-cmd-badge{font-size:0.62rem;font-weight:700;border-radius:100px;padding:3px 10px;flex-shrink:0}
+.treino-cmd-badge.ok{background:rgba(45,106,79,0.12);color:var(--accent);border:1px solid rgba(45,106,79,0.25)}
+.treino-cmd-badge.nao{background:var(--bg2);color:var(--text3);border:1px solid var(--border)}
+.treino-cmd-badge.rec{background:var(--red-light);color:var(--red);border:1px solid rgba(192,57,43,0.25)}
+
+.treino-cmd-body{padding:0 14px 12px;display:none}
+.treino-cmd-body.open{display:block}
+.treino-wave{height:36px;background:var(--bg2);border-radius:8px;margin-bottom:8px;overflow:hidden;position:relative}
+.treino-wave-bars{display:flex;align-items:center;justify-content:center;gap:2px;height:100%;padding:4px 8px}
+.treino-wave-bar{width:3px;background:var(--accent);border-radius:2px;transition:height 0.05s;min-height:2px}
+.treino-wave-idle{font-size:0.65rem;color:var(--text3);position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.treino-btns{display:flex;gap:8px}
+.treino-btn{flex:1;font-size:0.75rem;font-weight:600;border:none;border-radius:8px;padding:9px;cursor:pointer;transition:all 0.15s}
+.treino-btn.gravar{background:var(--red);color:#fff}
+.treino-btn.gravar:active{opacity:0.8}
+.treino-btn.parar{background:var(--text);color:#fff}
+.treino-btn.parar:active{opacity:0.8}
+.treino-btn.regravar{background:var(--bg2);color:var(--text2);border:1px solid var(--border)}
+.treino-btn.regravar:active{opacity:0.8}
+.treino-btn:disabled{opacity:0.4;cursor:not-allowed}
+
+.treino-result{font-size:0.72rem;color:var(--text3);margin-top:6px;padding:6px 10px;background:var(--bg2);border-radius:6px;display:none}
+.treino-result.show{display:block}
+.treino-result.ok{background:rgba(45,106,79,0.08);color:var(--accent2)}
+.treino-result.err{background:var(--red-light);color:var(--red)}
+
+.treino-rms-row{display:flex;align-items:center;gap:8px;margin-top:6px}
+.treino-rms-label{font-size:0.62rem;color:var(--text3)}
+.treino-rms-bar{flex:1;height:4px;background:var(--bg2);border-radius:2px;overflow:hidden}
+.treino-rms-fill{height:100%;border-radius:2px;transition:width 0.1s,background 0.2s}
+
+.btn-salvar-treino{width:100%;font-family:var(--display);font-size:1rem;font-weight:700;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);padding:16px;cursor:pointer;margin-top:14px;box-shadow:0 4px 20px rgba(45,106,79,0.28);transition:all 0.2s;display:none}
+.btn-salvar-treino.show{display:block}
+.btn-salvar-treino:active{transform:scale(0.98)}
+.btn-resetar-treino{width:100%;font-size:0.72rem;font-weight:600;color:var(--text3);background:none;border:1px solid var(--border);border-radius:10px;padding:10px;cursor:pointer;margin-top:8px}
+
+/* SETUP */
+.setup-overlay{position:fixed;inset:0;background:rgba(20,12,4,0.55);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.setup-overlay.show{display:flex}
+.setup-sheet{background:var(--card);border-radius:20px 20px 0 0;padding:26px 20px 44px;width:100%;max-width:540px}
+.setup-title{font-family:var(--display);font-size:1.3rem;font-weight:700;color:var(--text);margin-bottom:6px}
+.setup-sub{font-size:0.73rem;color:var(--text3);margin-bottom:18px;line-height:1.55}
+.setup-inp{width:100%;font-family:var(--mono);font-size:0.82rem;background:var(--bg2);color:var(--text);border:1.5px solid var(--border2);border-radius:10px;padding:13px 14px;outline:none;margin-bottom:12px}
+.setup-inp:focus{border-color:var(--accent)}
+.btn-setup{width:100%;font-family:var(--display);font-size:1rem;font-weight:700;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:16px;cursor:pointer}
+.btn-setup:active{opacity:0.85}
+
+/* CONFIRM */
+.confirm-overlay{position:fixed;inset:0;background:rgba(20,12,4,0.45);z-index:300;display:none;align-items:center;justify-content:center;padding:20px}
+.confirm-overlay.show{display:flex}
+.confirm-box{background:var(--card);border-radius:16px;padding:22px 20px;width:100%;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,0.18)}
+.confirm-title{font-weight:700;font-size:0.95rem;color:var(--text);margin-bottom:8px}
+.confirm-msg{font-size:0.78rem;color:var(--text3);line-height:1.5;margin-bottom:18px}
+.confirm-btns{display:flex;gap:10px}
+.confirm-btn{flex:1;font-family:var(--mono);font-size:0.82rem;font-weight:600;border:none;border-radius:10px;padding:12px;cursor:pointer}
+.confirm-btn.cancel{background:var(--bg2);color:var(--text2)}
+.confirm-btn.danger{background:var(--red);color:#fff}
+.confirm-btn:active{opacity:0.8}
+
+/* TOAST */
+.toast{position:fixed;top:18px;left:50%;transform:translateX(-50%) translateY(-70px);background:var(--text);color:var(--bg);font-size:0.77rem;padding:10px 22px;border-radius:100px;z-index:500;transition:transform 0.3s;box-shadow:0 4px 16px rgba(0,0,0,0.18);max-width:88vw;text-align:center}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* IA speaking */
+.ia-speaking{position:fixed;top:14px;right:14px;background:var(--accent);color:#fff;font-size:0.66rem;padding:6px 14px;border-radius:100px;z-index:400;display:none;align-items:center;gap:6px;box-shadow:0 2px 10px rgba(45,106,79,0.3)}
+.ia-speaking.show{display:flex}
+.spk-dot{width:6px;height:6px;border-radius:50%;background:#fff;animation:breathe 0.6s infinite}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+<div class="ia-speaking" id="ia-speaking"><div class="spk-dot"></div><span>IA falando...</span></div>
+
+<!-- CONFIRM -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-title" id="confirm-title">Confirmar</div>
+    <div class="confirm-msg" id="confirm-msg"></div>
+    <div class="confirm-btns">
+      <button class="confirm-btn cancel" onclick="confirmClose()">Cancelar</button>
+      <button class="confirm-btn danger" onclick="confirmDo()">Apagar</button>
+    </div>
+  </div>
+</div>
+
+<!-- HOME -->
+<div class="screen active" id="home">
+  <div class="home-header">
+    <div class="home-title">PDDAI</div>
+    <div class="home-subtitle">Organizador de Comandas por Voz</div>
+    <div class="ia-status-row">
+      <div class="ia-dot" id="ia-dot"></div>
+      <span class="ia-status-txt" id="ia-status-txt">IA desligada</span>
+    </div>
+  </div>
+  <button class="btn-ia" id="btn-ia" onclick="toggleIA()">🎙 Iniciar IA</button>
+
+  <div class="live-box" id="live-box">
+    <div class="live-label">🎙 Transcrição</div>
+    <div class="live-text" id="live-text"></div>
+  </div>
+
+  <div class="acc-box" id="acc-box">
+    <div class="acc-header">
+      <div class="acc-label">⏳ Acumulando pedido — diga "mesa X" para fechar</div>
+      <div class="acc-timer" id="acc-timer"></div>
+    </div>
+    <div class="acc-text" id="acc-text"></div>
+    <div class="acc-progress"><div class="acc-fill" id="acc-fill" style="width:100%"></div></div>
+  </div>
+
+  <div class="proc-bar" id="proc-bar">
+    <div class="spin"></div><span id="proc-txt">Processando pedido com IA...</span>
+  </div>
+
+  <div class="nav-cards">
+    <div class="nav-card" onclick="goTo('andamento')">
+      <div class="nav-card-left"><div class="nav-card-icon">🍽️</div>
+        <div><div class="nav-card-label">Pedidos em Andamento</div><div class="nav-card-sub" id="sub-andamento">Nenhuma mesa</div></div>
+      </div><div class="nav-badge amber" id="badge-andamento">0</div>
+    </div>
+    <div class="nav-card" onclick="goTo('anotar')">
+      <div class="nav-card-left"><div class="nav-card-icon">📝</div>
+        <div><div class="nav-card-label">Anotar Pedidos</div><div class="nav-card-sub" id="sub-anotar">Nenhuma mesa</div></div>
+      </div><div class="nav-badge blue" id="badge-anotar">0</div>
+    </div>
+    <div class="nav-card" onclick="goTo('historico')">
+      <div class="nav-card-left"><div class="nav-card-icon">🔎</div>
+        <div><div class="nav-card-label">Histórico</div><div class="nav-card-sub" id="sub-historico">Nenhum registro</div></div>
+      </div><div class="nav-badge gray" id="badge-historico">0</div>
+    </div>
+    <div class="nav-card" onclick="goTo('treino')" id="nav-treino">
+      <div class="nav-card-left"><div class="nav-card-icon">🎓</div>
+        <div><div class="nav-card-label">Treinar Minha Voz</div><div class="nav-card-sub" id="sub-treino">Não treinado — toque para calibrar</div></div>
+      </div><span id="badge-treino" style="font-size:1.2rem;color:var(--text3)">›</span>
+    </div>
+    <div class="nav-card" onclick="goTo('comandos')">
+      <div class="nav-card-left"><div class="nav-card-icon">⚙️</div>
+        <div><div class="nav-card-label">Comandos</div><div class="nav-card-sub">Lista de todos os comandos de voz</div></div>
+      </div><span style="font-size:1.2rem;color:var(--text3)">›</span>
+    </div>
+  </div>
+</div>
+
+<!-- ANDAMENTO -->
+<div class="screen" id="sc-andamento">
+  <div class="inner-header">
+    <div class="btn-back" onclick="goTo('home')">🔙</div>
+    <div class="inner-title">Pedidos em Andamento</div>
+    <button class="btn-clear-all" onclick="askClearAll('andamento')">🗑 Limpar</button>
+  </div>
+  <div class="mesa-list" id="list-andamento"></div>
+</div>
+
+<!-- ANOTAR -->
+<div class="screen" id="sc-anotar">
+  <div class="inner-header">
+    <div class="btn-back" onclick="goTo('home')">🔙</div>
+    <div class="inner-title">Anotar Pedidos</div>
+    <button class="btn-clear-all" onclick="askClearAll('anotar')">🗑 Limpar</button>
+  </div>
+  <div class="mesa-list" id="list-anotar"></div>
+</div>
+
+<!-- HISTÓRICO -->
+<div class="screen" id="sc-historico">
+  <div class="inner-header">
+    <div class="btn-back" onclick="goTo('home')">🔙</div>
+    <div class="inner-title">Histórico</div>
+    <button class="btn-clear-all" onclick="askClearAll('historico')">🗑 Limpar</button>
+  </div>
+  <div class="mesa-list" id="list-historico"></div>
+</div>
+
+<!-- COMANDOS -->
+<div class="screen" id="sc-comandos">
+  <div class="inner-header">
+    <div class="btn-back" onclick="goTo('home')">🔙</div>
+    <div class="inner-title">Comandos de Voz</div>
+  </div>
+  <div class="cmd-scroll">
+    <div class="cmd-sec-title">📋 Fazer Pedido</div>
+    <div class="cmd-item"><div class="cmd-voice">"ok [pedido] mesa X"</div><div class="cmd-desc">Registra um pedido. A IA acumula tudo que você falar até ouvir "mesa X". Funciona mesmo que o pedido seja longo ou dito em partes.<br><em>Ex: "ok 1 coca gelo e limão, 2 cocas, um negroni, mesa 7"</em></div></div>
+    <div class="cmd-item"><div class="cmd-voice">"ok fechar conta mesa X"</div><div class="cmd-desc">Registra fechamento de conta da mesa X.</div></div>
+    <div class="cmd-sec-title">🍽️ Pedidos em Andamento</div>
+    <div class="cmd-item"><div class="cmd-voice">"pedido pendente"</div><div class="cmd-desc">IA responde por voz as mesas em andamento. Se vazio: "nada por aqui". Também aceita: "pedidos pendentes", "pedido pendentes".</div></div>
+    <div class="cmd-item"><div class="cmd-voice">"número X"</div><div class="cmd-desc">IA lê por voz todos os itens da mesa X. Também aceita: "número X", "números X".<br><em>Ex: "número 7" → IA fala os itens da mesa 7</em></div></div>
+    <div class="cmd-item"><div class="cmd-voice">"sent X"</div><div class="cmd-desc">Conclui mesa X → move para Anotar Pedidos.<br><em>Ex: "sent 3" → mesa 3 entregue</em></div></div>
+    <div class="cmd-sec-title">📝 Anotar Pedidos</div>
+    <div class="cmd-item"><div class="cmd-voice">"anota pedido"</div><div class="cmd-desc">IA responde por voz as mesas para anotar. Se vazio: "nada por aqui". Também aceita: "anotar pedidos".</div></div>
+    <div class="cmd-item"><div class="cmd-voice">"anota X"</div><div class="cmd-desc">IA lê por voz os itens da mesa X para anotar.<br><em>Ex: "anota 5" → IA fala os itens da mesa 5</em></div></div>
+    <div class="cmd-item"><div class="cmd-voice">"mesa X anotada"</div><div class="cmd-desc">Conclui mesa X de anotar → move para Histórico.</div></div>
+    <div class="cmd-item"><div class="cmd-voice">"tudo anotado"</div><div class="cmd-desc">Conclui todas as mesas de anotar → move para Histórico.</div></div>
+  </div>
+</div>
+
+<!-- TREINO DE VOZ -->
+<div class="screen" id="sc-treino">
+  <div class="inner-header">
+    <div class="btn-back" onclick="goTo('home')">🔙</div>
+    <div class="inner-title">Treinar Minha Voz</div>
+  </div>
+  <div class="treino-scroll" id="treino-scroll">
+    <div class="treino-status-bar">
+      <div class="treino-status-icon" id="treino-status-icon">🎤</div>
+      <div class="treino-status-info">
+        <div class="treino-status-title" id="treino-status-title">Grave cada comando com sua voz</div>
+        <div class="treino-status-sub" id="treino-status-sub">O app aprende seu timbre, sotaque e volume para filtrar ruídos do bar</div>
+        <div class="treino-progress-row">
+          <div class="treino-progress-bar"><div class="treino-progress-fill" id="treino-progress-fill" style="width:0%"></div></div>
+          <span class="treino-progress-txt" id="treino-progress-txt">0 / 0</span>
+        </div>
+      </div>
+    </div>
+    <div id="treino-lista"></div>
+    <button class="btn-salvar-treino" id="btn-salvar-treino" onclick="salvarTreino()">✅ Salvar Calibração de Voz</button>
+    <button class="btn-resetar-treino" id="btn-resetar-treino" onclick="resetarTreino()" style="display:none">🗑 Apagar treino e recomeçar</button>
+  </div>
+</div>
+
+<!-- SETUP -->
+<div class="setup-overlay" id="setup-overlay">
+  <div class="setup-sheet">
+    <div class="setup-title">Configurar IA</div>
+    <div class="setup-sub">Cole sua chave da OpenAI. Ela fica salva apenas no seu dispositivo.</div>
+    <input type="password" class="setup-inp" id="setup-key" placeholder="sk-..." autocomplete="off" spellcheck="false">
+    <button class="btn-setup" onclick="saveSetup()">Salvar e Iniciar IA</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════
+let apiKey = localStorage.getItem('pddai_key') || '';
+let iaOn = false;
+let audioCtx = null, scriptProc = null, micStream = null;
+let recBuffers = [], sampleRate = 16000;
+let chunkTimer = null;
+
+// VAD state — Voice Activity Detection
+let vadSilenceFrames = 0;
+let vadSpeakingFrames = 0;
+let vadIsSpeaking = false;
+const VAD_SPEAK_THRESHOLD  = 0.012;  // RMS mínimo para considerar voz
+const VAD_SILENCE_FRAMES   = 18;     // frames silenciosos antes de cortar (~1.5s a 5000ms/chunk)
+const VAD_SPEAK_FRAMES     = 3;      // frames com voz para confirmar fala
+
+// Pedido accumulator
+let acc = '';           // accumulated transcript
+let accTimer = null;    // timeout timer
+let accSecs = 0;        // countdown
+let accCountdown = null;
+const ACC_TIMEOUT = 30; // seconds before giving up
+
+let db = { andamento:[], anotar:[], historico:[] };
+try{ const s=localStorage.getItem('pddai_db'); if(s) db=JSON.parse(s); }catch(e){}
+function saveDB(){ try{ localStorage.setItem('pddai_db',JSON.stringify(db)); }catch(e){} }
+
+// ══════════════════════════════════════════════════════
+// VOICE PROFILE — calibração da voz do usuário
+// ══════════════════════════════════════════════════════
+let voiceProfile = null; // { rmsMin, rmsAvg, rmsMax, threshold, gravacoes: {cmdId: transcript} }
+try{ const vp=localStorage.getItem('pddai_voice'); if(vp) voiceProfile=JSON.parse(vp); }catch(e){}
+
+function saveVoiceProfile(){ try{ localStorage.setItem('pddai_voice', JSON.stringify(voiceProfile)); }catch(e){} }
+
+// Comandos para treinar — frase exata + dica de como falar
+const TREINO_CMDS = [
+  { id:'ok',         frase:'ok',                          dica:'Palavra de ativação — diga claramente' },
+  { id:'ok_pedido',  frase:'ok um negroni mesa sete',     dica:'Exemplo de pedido completo' },
+  { id:'pendente',   frase:'pedido pendente',             dica:'Ver mesas em andamento' },
+  { id:'numero',     frase:'número cinco',                dica:'Ver itens de uma mesa pelo número' },
+  { id:'sent',       frase:'sent três',                   dica:'Marcar mesa como entregue' },
+  { id:'anota_ped',  frase:'anota pedido',                dica:'Ver mesas para anotar' },
+  { id:'anota_mesa', frase:'anota dois',                  dica:'Ler itens de mesa para anotar' },
+  { id:'anotada',    frase:'mesa quatro anotada',         dica:'Marcar mesa como anotada' },
+  { id:'tudo_ano',   frase:'tudo anotado',                dica:'Fechar todas as mesas de uma vez' },
+  { id:'fechar',     frase:'ok fechar conta mesa oito',   dica:'Fechar a conta de uma mesa' },
+];
+
+// Estado do treino
+let treinoAtivo = null; // { cmdId, audioCtx, micStream, scriptProc, buffers, waveTimer }
+let treinoGravacoes = {}; // { cmdId: { rms, transcript, blob } }
+try{ const tg=localStorage.getItem('pddai_treino_g'); if(tg) treinoGravacoes=JSON.parse(tg);}catch(e){}
+
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const sc = id==='home' ? document.getElementById('home') : document.getElementById('sc-'+id);
+  if(sc) sc.classList.add('active');
+  updateCounts();
+  if(['andamento','anotar','historico'].includes(id)) renderList(id);
+  if(id==='treino') renderTreino();
+}
+
+function updateTreinoNavBadge(){
+  const total = TREINO_CMDS.length;
+  const gravados = Object.keys(treinoGravacoes).length;
+  const sub = document.getElementById('sub-treino');
+  const badge = document.getElementById('badge-treino');
+  if(voiceProfile){
+    sub.textContent = `Calibrado — ${gravados}/${total} comandos gravados`;
+    badge.textContent = '✅';
+    badge.style.fontSize = '1.1rem';
+  } else if(gravados>0){
+    sub.textContent = `${gravados}/${total} gravados — salve para ativar`;
+    badge.textContent = `${gravados}/${total}`;
+    badge.style.fontSize = '0.75rem';
+    badge.style.background = 'var(--amber-light)';
+    badge.style.color = 'var(--amber)';
+    badge.style.padding = '4px 10px';
+    badge.style.borderRadius = '100px';
+  } else {
+    sub.textContent = 'Não treinado — toque para calibrar';
+    badge.textContent = '›';
+    badge.style.fontSize = '1.2rem';
+  }
+}
+
+function renderTreino(){
+  const lista = document.getElementById('treino-lista');
+  lista.innerHTML = '';
+  const total = TREINO_CMDS.length;
+  const gravados = Object.keys(treinoGravacoes).length;
+
+  // Progress
+  document.getElementById('treino-progress-fill').style.width = (gravados/total*100)+'%';
+  document.getElementById('treino-progress-txt').textContent = `${gravados} / ${total}`;
+
+  if(voiceProfile){
+    document.getElementById('treino-status-icon').textContent = '✅';
+    document.getElementById('treino-status-title').textContent = 'Voz calibrada e ativa!';
+    document.getElementById('treino-status-sub').textContent = `Threshold: ${voiceProfile.threshold.toFixed(4)} — RMS médio: ${voiceProfile.rmsAvg.toFixed(4)}`;
+    document.getElementById('btn-resetar-treino').style.display = 'block';
+  } else {
+    document.getElementById('treino-status-icon').textContent = '🎤';
+    document.getElementById('treino-status-title').textContent = gravados>0 ? `${gravados} de ${total} comandos gravados` : 'Grave cada comando com sua voz';
+    document.getElementById('treino-status-sub').textContent = 'O app aprende seu timbre, sotaque e volume para filtrar ruídos do bar';
+    document.getElementById('btn-resetar-treino').style.display = gravados>0 ? 'block' : 'none';
+  }
+
+  // Botão salvar
+  const btnSalvar = document.getElementById('btn-salvar-treino');
+  if(gravados >= Math.ceil(total*0.6) && !voiceProfile){
+    btnSalvar.classList.add('show');
+    btnSalvar.textContent = `✅ Salvar Calibração (${gravados}/${total} gravados)`;
+  } else if(voiceProfile){
+    btnSalvar.classList.add('show');
+    btnSalvar.textContent = '🔄 Atualizar Calibração';
+  } else {
+    btnSalvar.classList.remove('show');
+  }
+
+  TREINO_CMDS.forEach(cmd => {
+    const grav = treinoGravacoes[cmd.id];
+    const isGravado = !!grav;
+
+    const card = document.createElement('div');
+    card.className = 'treino-cmd-card' + (isGravado ? ' gravado' : '');
+    card.id = 'treino-card-' + cmd.id;
+
+    // Gera 20 barras do waveform
+    const bars = Array.from({length:20}, (_,i)=>`<div class="treino-wave-bar" id="twb-${cmd.id}-${i}" style="height:2px"></div>`).join('');
+
+    card.innerHTML = `
+      <div class="treino-cmd-hd" onclick="toggleTreinoCard('${cmd.id}')">
+        <div class="treino-cmd-icon">${isGravado ? '✅' : '🎙'}</div>
+        <div class="treino-cmd-info">
+          <div class="treino-cmd-frase">"${cmd.frase}"</div>
+          <div class="treino-cmd-dica">${cmd.dica}</div>
+        </div>
+        <span class="treino-cmd-badge ${isGravado ? 'ok' : 'nao'}" id="treino-badge-${cmd.id}">${isGravado ? 'Gravado' : 'Pendente'}</span>
+      </div>
+      <div class="treino-cmd-body" id="treino-body-${cmd.id}">
+        <div class="treino-wave">
+          <div class="treino-wave-idle" id="treino-idle-${cmd.id}">${isGravado ? '🎵 Gravado com sucesso' : '🎤 Pronto para gravar'}</div>
+          <div class="treino-wave-bars" id="treino-bars-${cmd.id}" style="display:none">${bars}</div>
+        </div>
+        <div class="treino-rms-row">
+          <span class="treino-rms-label">Volume detectado:</span>
+          <div class="treino-rms-bar"><div class="treino-rms-fill" id="treino-rms-${cmd.id}" style="width:0%;background:var(--accent)"></div></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="treino-btn gravar" id="treino-btn-gravar-${cmd.id}" onclick="iniciarGravacaoCmd('${cmd.id}')">⏺ Gravar</button>
+          <button class="treino-btn parar" id="treino-btn-parar-${cmd.id}" onclick="pararGravacaoCmd('${cmd.id}')" disabled>⏹ Parar</button>
+          ${isGravado ? `<button class="treino-btn regravar" onclick="regravar('${cmd.id}')">↺ Regravar</button>` : ''}
+        </div>
+        <div class="treino-result" id="treino-result-${cmd.id}">${isGravado && grav.transcript ? '🎯 Transcrito: "'+grav.transcript+'"' : ''}</div>
+      </div>`;
+    lista.appendChild(card);
+
+    // Auto-abre o primeiro não gravado
+    if(!isGravado && !lista.querySelector('.treino-cmd-body.open')){
+      card.querySelector('.treino-cmd-body').classList.add('open');
+    }
+    // Mostra resultado se já gravado
+    if(isGravado && grav.transcript){
+      card.querySelector('.treino-result').classList.add('show','ok');
+    }
+  });
+}
+
+function toggleTreinoCard(cmdId){
+  const body = document.getElementById('treino-body-'+cmdId);
+  body.classList.toggle('open');
+}
+
+async function iniciarGravacaoCmd(cmdId){
+  if(treinoAtivo) await pararGravacaoCmd(treinoAtivo.cmdId);
+
+  const btnG = document.getElementById('treino-btn-gravar-'+cmdId);
+  const btnP = document.getElementById('treino-btn-parar-'+cmdId);
+  const card = document.getElementById('treino-card-'+cmdId);
+  const badge = document.getElementById('treino-badge-'+cmdId);
+  const idle = document.getElementById('treino-idle-'+cmdId);
+  const barsEl = document.getElementById('treino-bars-'+cmdId);
+  const resultEl = document.getElementById('treino-result-'+cmdId);
+
+  let micSt, aCtx, sPrc, buffers=[];
+
+  try{
+    micSt = await navigator.mediaDevices.getUserMedia({
+      audio:{channelCount:1,sampleRate:16000,echoCancellation:true,noiseSuppression:true,autoGainControl:true},
+      video:false
+    });
+  }catch(e){ toast('Erro microfone: '+e.message); return; }
+
+  aCtx = new(window.AudioContext||window.webkitAudioContext)({sampleRate:16000});
+  const src = aCtx.createMediaStreamSource(micSt);
+
+  // Filtros — mesmo pipeline do app principal
+  const hp = aCtx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=200;
+  const lp = aCtx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=4000;
+  const comp = aCtx.createDynamicsCompressor();
+  comp.threshold.value=-24; comp.knee.value=10; comp.ratio.value=4; comp.attack.value=0.003; comp.release.value=0.15;
+  const gain = aCtx.createGain(); gain.gain.value=1.4;
+
+  sPrc = aCtx.createScriptProcessor(2048,1,1);
+  sPrc.onaudioprocess = e => {
+    const data = new Float32Array(e.inputBuffer.getChannelData(0));
+    buffers.push(data.slice());
+    // Atualiza waveform em tempo real
+    const r = rms(data);
+    const pct = Math.min(r/0.1*100, 100);
+    const rmsEl = document.getElementById('treino-rms-'+cmdId);
+    if(rmsEl){
+      rmsEl.style.width = pct+'%';
+      rmsEl.style.background = r>0.012 ? 'var(--accent)' : 'var(--border2)';
+    }
+    // Barras do waveform
+    const barEls = barsEl.querySelectorAll('.treino-wave-bar');
+    barEls.forEach((b,i)=>{
+      const v = Math.random()*0.5+0.5;
+      b.style.height = Math.max(2, r*600*v)+'px';
+    });
+  };
+
+  src.connect(hp); hp.connect(lp); lp.connect(comp); comp.connect(gain); gain.connect(sPrc);
+  sPrc.connect(aCtx.destination);
+
+  treinoAtivo = {cmdId, audioCtx:aCtx, micStream:micSt, scriptProc:sPrc, buffers};
+
+  // UI
+  card.classList.add('gravando');
+  badge.textContent = '🔴 Gravando...'; badge.className = 'treino-cmd-badge rec';
+  btnG.disabled = true; btnP.disabled = false;
+  idle.style.display = 'none'; barsEl.style.display = 'flex';
+  resultEl.classList.remove('show','ok','err');
+
+  // Para automaticamente após 5s
+  treinoAtivo.autoStop = setTimeout(()=>pararGravacaoCmd(cmdId), 5000);
+}
+
+async function pararGravacaoCmd(cmdId){
+  if(!treinoAtivo || treinoAtivo.cmdId !== cmdId) return;
+  clearTimeout(treinoAtivo.autoStop);
+
+  const {audioCtx:aCtx, micStream:micSt, scriptProc:sPrc, buffers} = treinoAtivo;
+  treinoAtivo = null;
+
+  sPrc.disconnect(); aCtx.close(); micSt.getTracks().forEach(t=>t.stop());
+
+  const card = document.getElementById('treino-card-'+cmdId);
+  const badge = document.getElementById('treino-badge-'+cmdId);
+  const idle = document.getElementById('treino-idle-'+cmdId);
+  const barsEl = document.getElementById('treino-bars-'+cmdId);
+  const btnG = document.getElementById('treino-btn-gravar-'+cmdId);
+  const btnP = document.getElementById('treino-btn-parar-'+cmdId);
+  const resultEl = document.getElementById('treino-result-'+cmdId);
+
+  card.classList.remove('gravando');
+  barsEl.style.display = 'none';
+  idle.style.display = 'flex'; idle.textContent = '⏳ Analisando...';
+  badge.textContent = '...'; badge.className = 'treino-cmd-badge nao';
+  btnG.disabled = true; btnP.disabled = true;
+
+  // Monta o áudio
+  let len=0; buffers.forEach(b=>len+=b.length);
+  const merged = new Float32Array(len);
+  let off=0; buffers.forEach(b=>{merged.set(b,off);off+=b.length;});
+
+  const chunkRms = rms(merged);
+
+  // Normaliza para envio
+  const peak = Math.max(...merged.map(Math.abs));
+  if(peak>0.01){ const sc=Math.min(0.85/peak,3); for(let i=0;i<merged.length;i++) merged[i]*=sc; }
+
+  const wav = encodeWAV(merged, 16000);
+
+  // Transcreve com Whisper para verificar
+  let transcript = '';
+  if(apiKey){
+    try{
+      const fd = new FormData();
+      fd.append('file', wav, 'treino.wav');
+      fd.append('model','whisper-1');
+      fd.append('language','pt');
+      fd.append('response_format','text');
+      fd.append('prompt', 'Garçom em bar: ok, mesa, pedido pendente, número, sent, anota pedido, anota, anotada, tudo anotado, fechar conta.');
+      const r = await fetch('https://api.openai.com/v1/audio/transcriptions',{
+        method:'POST', headers:{Authorization:'Bearer '+apiKey}, body:fd
+      });
+      if(r.ok) transcript = (await r.text()).trim();
+    }catch(e){}
+  }
+
+  // Salva gravação com dados de perfil vocal
+  treinoGravacoes[cmdId] = { rms: chunkRms, transcript, ts: Date.now() };
+  try{ localStorage.setItem('pddai_treino_g', JSON.stringify(treinoGravacoes)); }catch(e){}
+
+  // Feedback visual
+  card.classList.add('gravado');
+  badge.textContent = 'Gravado'; badge.className = 'treino-cmd-badge ok';
+  idle.textContent = '🎵 Gravado com sucesso';
+  btnG.disabled = false; btnP.disabled = true;
+  card.querySelector('.treino-cmd-icon').textContent = '✅';
+
+  if(transcript){
+    resultEl.textContent = `🎯 Transcrito: "${transcript}"`;
+    resultEl.className = 'treino-result show ok';
+  } else {
+    resultEl.textContent = apiKey ? '⚠️ Sem transcrição — verifique sua chave ou fale mais alto' : '💾 Salvo (configure a chave API para verificar transcrição)';
+    resultEl.className = 'treino-result show' + (apiKey?' err':'');
+  }
+
+  renderTreino();
+  updateTreinoNavBadge();
+}
+
+function regravar(cmdId){
+  delete treinoGravacoes[cmdId];
+  try{ localStorage.setItem('pddai_treino_g', JSON.stringify(treinoGravacoes)); }catch(e){}
+  renderTreino();
+}
+
+function salvarTreino(){
+  const gravs = Object.values(treinoGravacoes);
+  if(gravs.length === 0){ toast('Grave pelo menos um comando primeiro'); return; }
+
+  const rmsList = gravs.map(g=>g.rms).filter(r=>r>0);
+  const rmsAvg = rmsList.reduce((a,b)=>a+b,0)/rmsList.length;
+  const rmsMin = Math.min(...rmsList);
+  const rmsMax = Math.max(...rmsList);
+
+  // Threshold = 40% do RMS mínimo detectado — abaixo disso é ruído de fundo
+  const threshold = Math.max(rmsMin * 0.4, 0.006);
+
+  voiceProfile = {
+    rmsMin, rmsAvg, rmsMax, threshold,
+    gravacoes: Object.fromEntries(Object.entries(treinoGravacoes).map(([k,v])=>[k,v.transcript])),
+    ts: Date.now()
+  };
+  saveVoiceProfile();
+
+  toast('✅ Voz calibrada! O app agora filtra ruídos do bar pelo seu perfil.');
+  renderTreino();
+  updateTreinoNavBadge();
+}
+
+function resetarTreino(){
+  treinoGravacoes = {};
+  voiceProfile = null;
+  try{ localStorage.removeItem('pddai_treino_g'); localStorage.removeItem('pddai_voice'); }catch(e){}
+  renderTreino();
+  updateTreinoNavBadge();
+  toast('Treino resetado.');
+}
+// ══════════════════════════════════════════════════════
+const NUM_MAP = {
+  'um':1,'uma':1,'dois':2,'duas':2,'três':3,'tres':3,'quatro':4,'cinco':5,
+  'seis':6,'sete':7,'oito':8,'nove':9,'dez':10,'onze':11,'doze':12,
+  'treze':13,'catorze':14,'quatorze':14,'quinze':15,'dezesseis':16,
+  'dezessete':17,'dezoito':18,'dezenove':19,'vinte':20,'vinte e um':21,
+  'vinte e dois':22,'trinta':30
+};
+
+function normalize(text) {
+  // Remove punctuation that breaks commands
+  let t = text.replace(/[,\.;:!?]/g, ' ');
+  // Collapse multiple spaces
+  t = t.replace(/\s+/g, ' ').trim();
+  // Convert "mesa dois" → "mesa 2" etc
+  // First handle multi-word numbers after mesa
+  t = t.replace(/mesa\s+vinte\s+e\s+(um|dois|duas)/gi, (m, n) => {
+    const map = {'um':21,'dois':22,'duas':22};
+    return 'mesa ' + (map[n.toLowerCase()]||n);
+  });
+  t = t.replace(/mesa\s+([a-záéíóúâêîôûãõàèìòùç]+)/gi, (match, word) => {
+    const n = NUM_MAP[word.toLowerCase()];
+    return n !== undefined ? 'mesa ' + n : match;
+  });
+  return t.toLowerCase();
+}
+
+// ══════════════════════════════════════════════════════
+// TEXT NORMALIZATION
+// ══════════════════════════════════════════════════════
+function updateCounts(){
+  ['andamento','anotar','historico'].forEach(k=>{
+    const n=db[k].length;
+    document.getElementById('badge-'+k).textContent=n;
+    const subs={
+      andamento:n?`${n} mesa${n>1?'s':''} aguardando`:'Nenhuma mesa',
+      anotar:n?`${n} mesa${n>1?'s':''} para anotar`:'Nenhuma mesa',
+      historico:n?`${n} registro${n>1?'s':''}`:'Nenhum registro'
+    };
+    document.getElementById('sub-'+k).textContent=subs[k];
+  });
+  updateTreinoNavBadge();
+}
+
+// ══════════════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════════════
+function renderList(stage){
+  const el=document.getElementById('list-'+stage);
+  const items=db[stage];
+  if(!items.length){
+    const icons={andamento:'🍽️',anotar:'📝',historico:'🔎'};
+    const msgs={andamento:'Nenhum pedido em andamento',anotar:'Nenhum pedido para anotar',historico:'Nenhum histórico ainda'};
+    el.innerHTML=`<div class="empty-state"><div class="empty-icon">${icons[stage]}</div><div class="empty-msg">${msgs[stage]}</div></div>`;
+    return;
+  }
+  el.innerHTML='';
+  items.forEach(mesa=>{
+    const div=document.createElement('div');
+    div.className='mesa-card';
+    const body=mesa.items.map(it=>{
+      if(it.type==='sub') return `<div class="m-sub">↳ ${it.qty>1?it.qty+' ':''}${it.name}</div>`;
+      if(it.type==='special') return `<div class="m-special">⚡ ${it.name}</div>`;
+      return `<div class="m-item"><span class="m-qty">${it.qty}</span><span class="m-name">${it.name}</span></div>`;
+    }).join('');
+    const concludeBtn = stage!=='historico'
+      ? `<span class="btn-ok" onclick="conclude('${stage}','${mesa.mesa}')">✅</span>` : '';
+    div.innerHTML=`
+      <div class="mesa-card-hd">
+        <div class="mesa-card-title">Mesa ${mesa.mesa}</div>
+        <div class="mesa-card-actions">
+          <span class="mesa-card-meta">${mesa.ts||''}</span>
+          <span class="btn-del" onclick="askDelMesa('${stage}','${mesa.mesa}')">🗑</span>
+          ${concludeBtn}
+        </div>
+      </div>
+      <div class="mesa-card-body">${body||'<div class="m-special">— fechar conta —</div>'}</div>`;
+    el.appendChild(div);
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// CONCLUDE
+// ══════════════════════════════════════════════════════
+function conclude(stage, mesa){
+  if(stage==='andamento'){
+    const i=db.andamento.findIndex(m=>m.mesa===mesa); if(i===-1) return;
+    const item=db.andamento.splice(i,1)[0];
+    const anotarItems=item.items.filter(it=>{
+      if(it.type!=='item') return false;
+      const n=it.name.toLowerCase();
+      return !n.startsWith('copo') && !n.startsWith('taça') && !n.startsWith('tarça')
+          && n!=='montar talheres e pratos' && n!=='montar pratos';
+    });
+    db.anotar.push({mesa:item.mesa,items:anotarItems,ts:item.ts});
+    saveDB(); updateCounts(); renderList('andamento');
+    toast(`Mesa ${mesa} → Anotar Pedidos ✓`);
+  } else if(stage==='anotar'){
+    const i=db.anotar.findIndex(m=>m.mesa===mesa); if(i===-1) return;
+    const item=db.anotar.splice(i,1)[0];
+    db.historico.unshift({mesa:item.mesa,items:item.items,ts:item.ts});
+    saveDB(); updateCounts(); renderList('anotar');
+    toast(`Mesa ${mesa} → Histórico ✓`);
+  }
+}
+
+function concludeAll(){
+  db.anotar.forEach(item=>db.historico.unshift({mesa:item.mesa,items:item.items,ts:item.ts}));
+  db.anotar=[];
+  saveDB(); updateCounts();
+  if(document.getElementById('sc-anotar').classList.contains('active')) renderList('anotar');
+  toast('Todas as mesas → Histórico ✓');
+}
+
+// ══════════════════════════════════════════════════════
+// DELETE
+// ══════════════════════════════════════════════════════
+let _confirmCb=null;
+function confirmClose(){ document.getElementById('confirm-overlay').classList.remove('show'); _confirmCb=null; }
+function confirmDo(){ if(_confirmCb) _confirmCb(); confirmClose(); }
+function askConfirm(title,msg,cb){
+  document.getElementById('confirm-title').textContent=title;
+  document.getElementById('confirm-msg').textContent=msg;
+  _confirmCb=cb;
+  document.getElementById('confirm-overlay').classList.add('show');
+}
+function askDelMesa(stage,mesa){
+  const labels={andamento:'Pedidos em Andamento',anotar:'Anotar Pedidos',historico:'Histórico'};
+  askConfirm(`Apagar Mesa ${mesa}`,`Remover mesa ${mesa} de "${labels[stage]}"?`,()=>{
+    db[stage]=db[stage].filter(m=>m.mesa!==mesa);
+    saveDB(); updateCounts(); renderList(stage);
+    toast(`Mesa ${mesa} removida`);
+  });
+}
+function askClearAll(stage){
+  const labels={andamento:'Pedidos em Andamento',anotar:'Anotar Pedidos',historico:'Histórico'};
+  askConfirm(`Limpar tudo`,`Apagar todos os registros de "${labels[stage]}"?`,()=>{
+    db[stage]=[];
+    saveDB(); updateCounts(); renderList(stage);
+    toast(`${labels[stage]} limpo`);
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// WAV
+// ══════════════════════════════════════════════════════
+function encodeWAV(samples,sr){
+  const buf=new ArrayBuffer(44+samples.length*2);
+  const v=new DataView(buf);
+  function ws(o,s){for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))}
+  ws(0,'RIFF');v.setUint32(4,36+samples.length*2,true);ws(8,'WAVE');
+  ws(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);
+  v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);
+  ws(36,'data');v.setUint32(40,samples.length*2,true);
+  let off=44;
+  for(let i=0;i<samples.length;i++,off+=2){
+    const s=Math.max(-1,Math.min(1,samples[i]));
+    v.setInt16(off,s<0?s*0x8000:s*0x7FFF,true);
+  }
+  return new Blob([buf],{type:'audio/wav'});
+}
+function rms(buf){let s=0;for(let i=0;i<buf.length;i++)s+=buf[i]*buf[i];return Math.sqrt(s/buf.length)}
+
+// ══════════════════════════════════════════════════════
+// IA ON/OFF
+// ══════════════════════════════════════════════════════
+function toggleIA(){
+  if(!apiKey){ document.getElementById('setup-overlay').classList.add('show'); return; }
+  if(iaOn) stopIA(); else startIA();
+}
+
+async function startIA(){
+  try{
+    micStream=await navigator.mediaDevices.getUserMedia({
+      audio:{
+        channelCount:1,
+        sampleRate:16000,
+        echoCancellation:true,
+        noiseSuppression:true,
+        autoGainControl:true,       // AGC — iguala volume automaticamente
+        latency:0.01
+      },
+      video:false
+    });
+  }catch(e){ toast('Erro microfone: '+e.message); return; }
+
+  audioCtx=new(window.AudioContext||window.webkitAudioContext)({sampleRate:16000});
+  sampleRate=audioCtx.sampleRate;
+  const src=audioCtx.createMediaStreamSource(micStream);
+
+  // ── Bandpass filter: mantém apenas frequências de voz humana (200Hz–4000Hz)
+  const highpass=audioCtx.createBiquadFilter();
+  highpass.type='highpass'; highpass.frequency.value=200; highpass.Q.value=0.7;
+  const lowpass=audioCtx.createBiquadFilter();
+  lowpass.type='lowpass'; lowpass.frequency.value=4000; lowpass.Q.value=0.7;
+
+  // ── Compressor dinâmico: sobe voz baixa, controla pico de ruído
+  const compressor=audioCtx.createDynamicsCompressor();
+  compressor.threshold.value=-24;
+  compressor.knee.value=10;
+  compressor.ratio.value=4;
+  compressor.attack.value=0.003;
+  compressor.release.value=0.15;
+
+  // ── Ganho leve para compensar perdas do filtro
+  const gainNode=audioCtx.createGain();
+  gainNode.gain.value=1.4;
+
+  // Threshold dinâmico — usa calibração de voz do usuário se disponível
+  const VAD_THRESHOLD_ATIVO = voiceProfile ? voiceProfile.threshold : VAD_SPEAK_THRESHOLD;
+
+  scriptProc=audioCtx.createScriptProcessor(4096,1,1);
+  scriptProc.onaudioprocess=e=>{
+    if(!iaOn) return;
+    const data=new Float32Array(e.inputBuffer.getChannelData(0));
+    const r=rms(data);
+
+    // VAD — detecta voz antes de guardar no buffer
+    if(r>VAD_THRESHOLD_ATIVO){
+      vadSpeakingFrames++;
+      vadSilenceFrames=0;
+      if(vadSpeakingFrames>=VAD_SPEAK_FRAMES && !vadIsSpeaking){
+        vadIsSpeaking=true;
+        updateVADIndicator(true);
+      }
+    } else {
+      vadSilenceFrames++;
+      vadSpeakingFrames=0;
+      if(vadSilenceFrames>=VAD_SILENCE_FRAMES && vadIsSpeaking){
+        vadIsSpeaking=false;
+        updateVADIndicator(false);
+      }
+    }
+
+    // Só grava quando há voz detectada (economiza ~60-70% de custo)
+    if(vadIsSpeaking || recBuffers.length>0) {
+      recBuffers.push(data.slice());
+    }
+  };
+
+  // Pipeline: microfone → highpass → lowpass → compressor → ganho → scriptProcessor
+  src.connect(highpass);
+  highpass.connect(lowpass);
+  lowpass.connect(compressor);
+  compressor.connect(gainNode);
+  gainNode.connect(scriptProc);
+  scriptProc.connect(audioCtx.destination);
+
+  iaOn=true; recBuffers=[];
+  vadSilenceFrames=0; vadSpeakingFrames=0; vadIsSpeaking=false;
+
+  // Chunk de 4s quando acumulando pedido, 6s em modo comando normal
+  chunkTimer=setInterval(processChunk, 4000);
+  setIAStatus('on');
+  toast('IA ativa! Diga "ok [pedido] mesa X"');
+}
+
+function updateVADIndicator(speaking){
+  const dot=document.getElementById('ia-dot');
+  if(speaking){
+    dot.style.background='var(--amber)';
+    dot.style.boxShadow='0 0 0 3px rgba(181,97,10,0.25)';
+  } else if(iaOn){
+    dot.style.background='';
+    dot.style.boxShadow='';
+  }
+}
+
+function stopIA(){
+  iaOn=false;
+  clearInterval(chunkTimer);
+  resetAcc();
+  vadSilenceFrames=0; vadSpeakingFrames=0; vadIsSpeaking=false;
+  if(scriptProc){ scriptProc.disconnect(); scriptProc=null; }
+  if(audioCtx){ audioCtx.close(); audioCtx=null; }
+  if(micStream){ micStream.getTracks().forEach(t=>t.stop()); micStream=null; }
+  recBuffers=[];
+  setIAStatus('off');
+  const dot=document.getElementById('ia-dot');
+  dot.style.background=''; dot.style.boxShadow='';
+  document.getElementById('live-box').classList.remove('show');
+  document.getElementById('proc-bar').classList.remove('show');
+  toast('IA desligada.');
+}
+
+function setIAStatus(s){
+  const dot=document.getElementById('ia-dot');
+  const txt=document.getElementById('ia-status-txt');
+  const btn=document.getElementById('btn-ia');
+  if(s==='on'){
+    dot.className='ia-dot on'; txt.textContent='IA ativa — ouvindo';
+    btn.textContent='🔴 IA Ativa — toque para desligar'; btn.classList.add('on');
+  } else {
+    dot.className='ia-dot'; txt.textContent='IA desligada';
+    btn.textContent='🎙 Iniciar IA'; btn.classList.remove('on');
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// ACCUMULATOR
+// ══════════════════════════════════════════════════════
+function startAcc(text){
+  acc = text;
+  accSecs = ACC_TIMEOUT;
+  updateAccUI();
+  clearTimeout(accTimer);
+  clearInterval(accCountdown);
+  accCountdown = setInterval(()=>{
+    accSecs--;
+    updateAccUI();
+    if(accSecs<=0){
+      clearInterval(accCountdown);
+      // Don't discard — send what we have to GPT as best effort
+      toast('Tempo esgotado — enviando pedido incompleto para revisão');
+      const full=acc; resetAcc();
+      registrarPedido(full, true); // flag as possibly incomplete
+    }
+  },1000);
+}
+
+function addToAcc(text){
+  acc += ' ' + text;
+  accSecs = ACC_TIMEOUT; // reset timer on new speech
+  updateAccUI();
+}
+
+function resetAcc(){
+  acc='';
+  clearTimeout(accTimer);
+  clearInterval(accCountdown);
+  accSecs=0;
+  document.getElementById('acc-box').classList.remove('show');
+}
+
+function updateAccUI(){
+  document.getElementById('acc-text').textContent = acc;
+  document.getElementById('acc-timer').textContent = accSecs+'s';
+  const pct = (accSecs/ACC_TIMEOUT)*100;
+  document.getElementById('acc-fill').style.width = pct+'%';
+  document.getElementById('acc-box').classList.add('show');
+}
+
+// ══════════════════════════════════════════════════════
+// PROCESS CHUNK
+// ══════════════════════════════════════════════════════
+async function processChunk(){
+  if(!recBuffers.length) return;
+  const bufs=[...recBuffers]; recBuffers=[];
+
+  let len=0; bufs.forEach(b=>len+=b.length);
+  const merged=new Float32Array(len);
+  let off=0; bufs.forEach(b=>{merged.set(b,off);off+=b.length});
+
+  // VAD gate: descarta chunk se RMS geral for muito baixo (silêncio ou ruído puro)
+  const chunkRms=rms(merged);
+  if(chunkRms<0.006) return;
+
+  // Normalização de volume: garante que a voz chegue ao Whisper em nível adequado
+  const peak=Math.max(...merged.map(Math.abs));
+  if(peak>0.01){
+    const targetPeak=0.85;
+    const scale=Math.min(targetPeak/peak, 3.0); // cap em 3x para não amplificar ruído
+    for(let i=0;i<merged.length;i++) merged[i]*=scale;
+  }
+
+  const wav=encodeWAV(merged,sampleRate);
+  let raw='';
+  try{ raw=await transcribe(wav); }catch(e){ return; }
+  if(!raw||!raw.trim()) return;
+
+  // Filtro pós-transcrição: descarta resultado se for só ruído ou muito curto
+  const cleaned=raw.trim().replace(/[^a-záéíóúâêîôûãõàèìòùçA-Z0-9\s]/g,'').trim();
+  if(cleaned.length<3) return;
+
+  const normalized = normalize(raw.trim());
+
+  // Show live
+  showLive(raw.trim());
+
+  // ── Se acumulando pedido
+  if(acc){
+    addToAcc(raw.trim());
+    const normAcc = normalize(acc);
+    if(/mesa\s*\d+/.test(normAcc)){
+      const full=acc; resetAcc();
+      await registrarPedido(full, false);
+    }
+    return;
+  }
+
+  // ── Verifica se inicia pedido ("ok")
+  if(/\bok\b/.test(normalized)){
+    startAcc(raw.trim());
+    if(/mesa\s*\d+/.test(normalized)){
+      const full=acc; resetAcc();
+      await registrarPedido(full, false);
+    }
+    return;
+  }
+
+  // ── Comandos regulares
+  await handleCommand(normalized);
+}
+
+function showLive(t){
+  document.getElementById('live-text').textContent=t;
+  document.getElementById('live-box').classList.add('show');
+  clearTimeout(showLive._t);
+  showLive._t=setTimeout(()=>document.getElementById('live-box').classList.remove('show'),5000);
+}
+
+// ══════════════════════════════════════════════════════
+// TRANSCRIBE
+// ══════════════════════════════════════════════════════
+async function transcribe(wav, tries=3){
+  // Vocabulary priming: fornece contexto rico ao Whisper para priorizar o vocabulário do app
+  const whisperPrompt = `Garçom em restaurante e bar brasileiro. Comandos frequentes: ok, mesa, pedido pendente, número, sent, anota pedido, anota, anotada, tudo anotado, fechar conta. Bebidas: coca, coca zero, guaraná, guaraná zero, fanta laranja, fanta uva, água sem gás, água com gás, del valle, heineken, amstel ultra, long neck. Vinhos: carménère, barbera, merselan, cabernet, sauvignon blanc, chardonnay, rosé de pinot. Espumantes: brut, moscatel. Copos: copo gelo e limão, copo só limão, copo gelo e limão espremido, copo só gelo, copo vazio, taça de vinho, taça de espumante, copo gelado. Drinks sem copo: blue bar, midnight sky, sunomono, entardecer, winter feeling, wood, sunrise, royal green, jägersummer, momento, tenesse mule, gin red bull, gin tropical, carmesim, tinto de verano, botânica, amanhecer, cosmopolitan, aperol spritz, mojito, negroni, rouge, sicília. Doses sem copo: jack tradicional, jack maçã, jack de mel, jack fire, woodford, tanqueray, black label, tequila, grey goose, buffalo trace, chivas, old par, jameson, absolut, steinhaeger, bacardi, smirnoff, jagermeister, licor 43. Chopps sem copo: schwarzwald, heineken 500, heineken 250. Aperitivos: dadinho de tapioca, coxinha de lagosta, carpaccio, big wheel, fish and chips, coxinha de linguiça, batata frita, mini hambúrguer, camarão rosa, iscas de peixe, croqueta de pernil, croqueta de camarão, croqueta de cupim, croqueta de feijoada. Pizzas com talheres: burrata, brie folheado, queijo cremoso com tomate, quatro queijos, lombinho defumado, brie com geleia de pimenta, calabresa.`;
+
+  for(let i=0;i<tries;i++){
+    try{
+      const fd=new FormData();
+      fd.append('file',wav,'audio.wav');
+      fd.append('model','whisper-1');
+      fd.append('language','pt');
+      fd.append('response_format','text');
+      fd.append('prompt', whisperPrompt);
+      const r=await fetch('https://api.openai.com/v1/audio/transcriptions',{
+        method:'POST',headers:{Authorization:'Bearer '+apiKey},body:fd
+      });
+      if(!r.ok) throw new Error(await r.text());
+      return await r.text();
+    }catch(e){
+      if(i===tries-1) throw e;
+      await new Promise(r=>setTimeout(r,500*(i+1))); // backoff progressivo
+    }
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// HANDLE COMMAND
+// ══════════════════════════════════════════════════════
+async function handleCommand(low){
+
+  // ── "pedido pendente" / "pedidos pendentes" / variações
+  if(/pedidos?\s+pendentes?/.test(low)){
+    if(!db.andamento.length){ speak('Nada por aqui'); return; }
+    speak(db.andamento.map(m=>'mesa '+m.mesa).join(', '));
+    return;
+  }
+
+  // ── "número X" / "números X" / "numero X" → ver itens da mesa X em andamento
+  const pm=/n[uú]meros?\s*(\d+)/.exec(low);
+  if(pm){
+    const m=db.andamento.find(x=>x.mesa===pm[1]);
+    if(!m){ speak('Mesa '+pm[1]+' não encontrada'); return; }
+    const parts=[];
+    let i=0;
+    while(i<m.items.length){
+      const it=m.items[i];
+      if(it.type==='item'){
+        parts.push(it.qty+' '+it.name);
+        if(i+1<m.items.length && m.items[i+1].type==='sub'){
+          i++;
+          const sub=m.items[i];
+          parts.push((sub.qty>1?sub.qty+' ':'')+sub.name);
+        }
+      } else if(it.type==='special'){
+        parts.push(it.name);
+      }
+      i++;
+    }
+    speak(parts.join(', ')||'Mesa sem itens'); return;
+  }
+
+  // ── "sent X" → mesa X entregue
+  const ent=/sent\s*(\d+)/.exec(low);
+  if(ent){ conclude('andamento',ent[1]); speak('Mesa '+ent[1]+' entregue'); return; }
+
+  // ── "anota pedido" / "anotar pedidos" → listar mesas para anotar
+  if(/anota[r]?\s+pedidos?/.test(low)){
+    if(!db.anotar.length){ speak('Nada por aqui'); return; }
+    speak(db.anotar.map(m=>'mesa '+m.mesa).join(', ')); return;
+  }
+
+  // ── "anota X" → ler itens da mesa X para anotar
+  const am=/anota\s+(\d+)/.exec(low);
+  if(am){
+    const m=db.anotar.find(x=>x.mesa===am[1]);
+    if(!m){ speak('Mesa '+am[1]+' não encontrada para anotar'); return; }
+    const itens=m.items.filter(i=>i.type==='item').map(i=>i.qty+' '+i.name).join(', ');
+    speak(itens||'Mesa sem itens'); return;
+  }
+
+  // ── "mesa X anotada"
+  const anotada=/mesa\s*(\d+)\s+anotada/.exec(low);
+  if(anotada){ conclude('anotar',anotada[1]); speak('Mesa '+anotada[1]+' anotada'); return; }
+
+  // ── "tudo anotado"
+  if(/tudo\s+anotado/.test(low)){ concludeAll(); speak('Tudo anotado'); return; }
+}
+
+// ══════════════════════════════════════════════════════
+// REGISTRAR PEDIDO — GPT corrige + interpreta
+// ══════════════════════════════════════════════════════
+const MENU=`CARDÁPIO COMPLETO:
+
+BEBIDAS EM COPO (sempre acompanham copo — padrão copo vazio, ou copo específico se pedido):
+coca, coca zero, guaraná, guaraná zero, fanta laranja, fanta uva, fanta guaraná, água sem gás, água com gás, del valle uva, del valle pêssego, del valle maracujá
+
+VINHOS (SEMPRE acompanham taça de vinho — nunca outro copo):
+carménère, vistis barbera, vistis merselan, cabernet, sauvignon blanc, chardonnay, rosé de pinot
+
+ESPUMANTES (SEMPRE acompanham taça de espumante — nunca outro copo):
+brut, moscatel, moscatel rosé
+
+LONG NECKS (SEMPRE acompanham copo gelado — nunca outro copo):
+long neck heineken, amstel ultra
+
+CHOPPS (NUNCA acompanham copo — servidos no próprio copo do chopp):
+schwarzwald 500, schwarzwald 250, heineken 500, heineken 250
+
+DRINKS (NUNCA acompanham copo — são servidos prontos, sem sub):
+blue bar, midnight sky, sunomono, entardecer, winter feeling, wood, sunrise, royal green, jägersummer, momento, tenesse mule, gin red bull, gin tropical, carmesim, tinto de verano, botânica, amanhecer, cosmopolitan, aperol spritz, mojito, negroni, rouge, sicília
+
+DOSES (NUNCA acompanham copo — são servidas sem sub):
+jack tradicional, jack maçã, jack de mel, jack fire, woodford, tanqueray, black label, tequila, tequila el jimador prata, grey goose, buffalo trace, chivas 18 anos, old par, jameson irish, absolut, steinhaeger, bacardi, bacardi prata, smirnoff, jagermeister, licor 43
+
+COPOS DISPONÍVEIS (apenas para bebidas em copo, vinhos, espumantes e long necks):
+copo gelo e limão, copo só limão, copo gelo e limão espremido, copo só limão espremido, copo só gelo, copo vazio, taça de vinho, taça de espumante, copo gelado
+
+APERITIVOS SEM TALHERES (geram "montar pratos" cada):
+dadinho de tapioca, coxinha de lagosta, carpaccio de carne, big wheel, fish and chips, coxinha de linguiça blumenau, batata frita, mini hambúrguer, camarão rosa, iscas de peixe, croqueta de pernil, croqueta de camarão, croqueta de cupim, croqueta de feijoada
+
+APERITIVOS COM TALHERES (geram "montar talheres e pratos" cada):
+burrata italiana, brie folheado, pizza queijo cremoso com tomate, pizza quatro queijos, pizza lombinho defumado, pizza brie com geleia de pimenta, pizza calabresa`;
+
+async function registrarPedido(transcript, possiblyIncomplete=false){
+  setProcBar(true,'Processando pedido com IA...');
+
+  const mesaM=/mesa\s*(\d+)/i.exec(normalize(transcript));
+  const mesaNum=mesaM?mesaM[1]:'?';
+
+  const extraNote = possiblyIncomplete
+    ? 'ATENÇÃO: O pedido pode estar incompleto (tempo esgotado). Processe o que foi capturado.' : '';
+
+  const prompt=`${MENU}
+
+PEDIDO TRANSCRITO (pode conter erros de pronúncia ou transcrição): "${transcript}"
+${extraNote}
+
+Sua tarefa:
+1. Corrija erros de transcrição comparando com o cardápio (ex: "de mão" pode ser "limão", "lonbinho" pode ser "lombinho", "nogroni" é "negroni")
+2. Interprete o pedido segundo as regras abaixo
+3. Retorne APENAS JSON válido, sem markdown, sem explicações
+
+Formato:
+{"mesa":"número","items":[{"type":"item","qty":1,"name":"nome"},{"type":"sub","qty":1,"name":"copo ou taça"}]}
+
+REGRAS OBRIGATÓRIAS — SIGA À RISCA:
+- type "item": qualquer produto do cardápio
+- type "sub": APENAS copos e taças, logo abaixo do item que acompanham
+- type "special": APENAS para "fechar conta"
+
+REGRAS DE COPO POR CATEGORIA:
+- BEBIDAS (coca, guaraná, água, del valle, fanta): type "sub" com copo vazio (padrão) OU copo específico se pedido. "coca gelo e limão" = coca + copo gelo e limão. "água sem gás" sem especificação = água sem gás + copo vazio. NUNCA "copo com gás" — isso não existe.
+- VINHOS: SEMPRE type "sub" com "taça de vinho". Nunca outro copo.
+- ESPUMANTES: SEMPRE type "sub" com "taça de espumante". Nunca outro copo.
+- LONG NECKS: SEMPRE type "sub" com "copo gelado". Nunca outro copo.
+- CHOPPS: SEM sub. Nunca adicionar copo para chopp.
+- DRINKS (negroni, mojito, aperol spritz etc.): SEM sub. NUNCA adicionar copo ou taça para drink.
+- DOSES: SEM sub. NUNCA adicionar copo para dose.
+- APERITIVOS/PIZZAS: adicione "montar pratos" ou "montar talheres e pratos" como type "item". Agrupe montagens iguais.
+- Se mesa não identificada, use "?" no campo mesa
+- Nunca invente itens que não foram pedidos`;
+
+  try{
+    const r=await fetch('https://api.openai.com/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
+      body:JSON.stringify({
+        model:'gpt-4o-mini',max_tokens:900,temperature:0,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const d=await r.json();
+    if(!d.choices?.[0]) throw new Error('Sem resposta da IA');
+    let raw=d.choices[0].message.content.trim().replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(raw);
+    const mesa=String(parsed.mesa||mesaNum);
+    const now=new Date();
+    const ts=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+
+    // Only to andamento — user manually advances stages
+    db.andamento=db.andamento.filter(m=>m.mesa!==mesa);
+    db.andamento.push({mesa, items:parsed.items||[], ts});
+    saveDB(); updateCounts();
+    setProcBar(false);
+    speak('Mesa '+mesa+' anotada');
+    toast(`✅ Mesa ${mesa} registrada!`);
+    if(document.getElementById('sc-andamento').classList.contains('active')) renderList('andamento');
+  }catch(e){
+    setProcBar(false);
+    toast('Erro ao processar pedido: '+e.message);
+    // Keep the raw transcript visible so user can re-say
+    showLive('❌ Falhou: '+transcript.substring(0,60));
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// SPEAK
+// ══════════════════════════════════════════════════════
+function speak(text){
+  if(!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='pt-BR'; u.rate=1.05; u.pitch=1;
+  const el=document.getElementById('ia-speaking');
+  el.classList.add('show');
+  u.onend=()=>el.classList.remove('show');
+  u.onerror=()=>el.classList.remove('show');
+  window.speechSynthesis.speak(u);
+}
+
+// ══════════════════════════════════════════════════════
+// UI
+// ══════════════════════════════════════════════════════
+function setProcBar(show,txt=''){
+  const b=document.getElementById('proc-bar');
+  document.getElementById('proc-txt').textContent=txt;
+  show?b.classList.add('show'):b.classList.remove('show');
+}
+let toastT=null;
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('show'),3500);
+}
+
+// ══════════════════════════════════════════════════════
+// SETUP
+// ══════════════════════════════════════════════════════
+function saveSetup(){
+  const v=document.getElementById('setup-key').value.trim();
+  if(!v.startsWith('sk-')){ toast('Chave inválida'); return; }
+  apiKey=v; localStorage.setItem('pddai_key',v);
+  document.getElementById('setup-overlay').classList.remove('show');
+  startIA();
+}
+
+// INIT
+updateCounts();
+updateTreinoNavBadge();
+if(apiKey) document.getElementById('ia-status-txt').textContent='Chave configurada — toque Iniciar IA';
+if(voiceProfile) toast('🎤 Perfil de voz ativo — threshold calibrado');
+</script>
+</body>
+</html>
